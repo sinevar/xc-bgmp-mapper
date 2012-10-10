@@ -49,20 +49,20 @@ class XcAdminBuilder
      */
     static public function myRegisterSettings() {
         add_settings_section(
-            'xs_main-settings-group',
+            'xc_main_settings_group',
             '', 
             array(__CLASS__, 'mySettingsSectionCallback' ), 
-            'xs_main-settings-group'
+            'xc_main_settings_group'
         );
         add_settings_field(
-            'xs_single_page_post_type', 
-            __('Single Page Post Type: '),
+            'xc_post_type', 
+            __('Custom Post Type: '),
             array(__CLASS__, 'mapSinglePagePostTypeField'),	
-            'xs_main-settings-group', 
-            'xs_main-settings-group', 
-            array('label_for' => 'xs_single_page_post_type')
+            'xc_main_settings_group', 
+            'xc_main_settings_group', 
+            array('label_for' => 'xc_post_type')
         );
-        register_setting('xs_main-settings-group', 'xs_single_page_post_type');
+        register_setting('xc_main_settings_group', 'xc_post_type');
     }
 
     /**
@@ -70,7 +70,7 @@ class XcAdminBuilder
      */
 		static public function mySettingsSectionCallback()
 		{
-		    echo '<p>Specify the name of your custom post type for single pages that is hosted inside your curreny used theme. It will let your bgmp placemarks maps be displayed in this template</p>';
+		    echo '<p>Specify the name of your custom post type where the [bgmp-map] shortcode should depict only one marked basing on post slug.</p>';
 		}
 
     /**
@@ -78,6 +78,6 @@ class XcAdminBuilder
      */
 		static public function mapSinglePagePostTypeField()
 		{
-		    echo '<input id="xs_single_page_post_type" name="xs_single_page_post_type" type="text" value="'. get_option('xs_single_page_post_type').'" style="width: 250px;" />';
+		    echo '<input id="xc_post_type" name="xc_post_type" type="text" value="'. get_option('xc_post_type').'" style="width: 250px;" /> (you can specify more, separated by comma)';
 		}
 }

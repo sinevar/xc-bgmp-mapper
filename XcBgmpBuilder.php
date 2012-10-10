@@ -6,12 +6,13 @@ if (__FILE__ === $_SERVER['SCRIPT_FILENAME']) {
 
 class XcBgmpBuilder
 {
+    /**
+     * Build all hooks needed for displaying single markup on custom post type
+     */
     static public function build()
     {
         add_action('wp', array(__CLASS__, 'myBgmpMapShortcodeCalled'));
-        add_filter('bgmp_get-map-placemarks-return', array(__CLASS__, 'myBgmpGetMapPlacemarksReturn'));
-        add_filter('single_template', array(__CLASS__, 'mySingleTemplates'));
-        //add_action('template_redirect', array(__CLASS__, 'flushRewriteRules'));
+        add_filter('bgmp_get-map-placemarks-query', array(__CLASS__, 'myBgmpGetMapPlacemarksQuery'));
     }
 
     /**
@@ -22,7 +23,7 @@ class XcBgmpBuilder
         global $post;
 
         $shortcodePageSlugs = array();
-        if ('bgmp' === $post->post_type) {
+        if (in_array($post->post_type, self::getCPTS())) {
             $shortcodePageSlugs[] = $post->post_name;
         }
 
@@ -34,56 +35,28 @@ class XcBgmpBuilder
     }
 
     /**
-     * Filters returned placemarks
+     * It allows to modify the query during retrival of placemarks from database
      *
-     * @param mixed $placemarks
      * @return array
      */
-    static public function myBgmpGetMapPlacemarksReturn($placemarks)
+    static public function myBgmpGetMapPlacemarksQuery($query)
     {
-        $id   = get_the_ID();
-        $post = get_post($id);
+        global $post;
 
-        $filteredPlacemarks = array();
-        foreach($placemarks as $placemark)
-        {
-            if ($post->post_title === $placemark['title']) {
-                $filteredPlacemarks[] = $placemark;
-            }
+        if (in_array($post->post_type, self::getCPTS())) {
+            $query['name'] = $post->post_name;
         }
 
-        return 'bgmp' === $post->post_type ? $filteredPlacemarks : $placemarks;
+        return $query;
     }
 
     /**
-     * Returns path to the template's file which is partly generated in admin panel
+     * Returns array of customer post types
      *
-     * @param mixed $single
-     * @return string|mixed
+     * @return array
      */
-    static public function mySingleTemplates($single)
+    static public function getCPTS()
     {
-        global $wp_query, $post;
-
-        if ('bgmp' === $post->post_type) {
-            $file = get_theme_root() . '/' . get_template() . '/single-' . get_option('xs_single_page_post_type') . '.php';
-            if (file_exists($file)) {
-                return $file;
-            }
-            wp_redirect(home_url('error404'));
-        }
-
-        return $single;
-    }
-
-    /**
-     * Can flush all rewrite rules, so if new post type is added, it should be taken into account automatically after it
-     *
-     */
-    static public function flushRewriteRules()
-    {
-        global $wp, $wp_rewrite;
-
-        $wp_rewrite->flush_rules();
+        return array_map('trim', explode(',', get_option('xc_post_type')));
     }
 }
