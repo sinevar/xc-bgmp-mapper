@@ -22,15 +22,16 @@ class XcBgmpBuilder
     {
         global $post;
 
-        $shortcodePageSlugs = array();
-        if (in_array($post->post_type, self::getCPTS())) {
-            $shortcodePageSlugs[] = $post->post_name;
+        $bgmps = query_posts('post_type=bgmp');
+        wp_reset_query(); //otherwise above query will be visible instead of the right one
+
+        $bgmpSlugs = array();
+        foreach ($bgmps as $bgmp) {
+            $bgmpSlugs[] = $bgmp->post_name;
         }
 
-        if ($post) {
-            if (in_array($post->post_name, $shortcodePageSlugs)) {
-                add_filter('bgmp_map-shortcode-called', '__return_true');
-            }
+        if ($post && in_array($post->post_type, self::getCPTS()) && in_array($post->post_name, $bgmpSlugs)) {
+            add_filter('bgmp_map-shortcode-called', '__return_true');
         }
     }
 
