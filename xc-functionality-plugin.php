@@ -38,9 +38,11 @@ define('XC_MIN_WP_VERSION', '3.4');
 
 if (version_compare(PHP_VERSION, XC_MIN_PHP_VERSION, '>=') && version_compare($wp_version, XC_MIN_WP_VERSION, '>=')) {
 
+    require_once(dirname(__FILE__) . '/XcFunctionBuilder.php');
     require_once(dirname(__FILE__) . '/XcBgmpBuilder.php');
     require_once(dirname(__FILE__) . '/XcAdminBuilder.php');
 
+    XcFunctionBuilder::build();
     XcBgmpBuilder::build();
     XcAdminBuilder::build();
 
